@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,24 +11,20 @@
             text-align: center;
             background-color: #f0f0f0;
         }
-
         h2 {
             color: #333;
         }
-
         #qr-reader {
             width: 100%;
             max-width: 400px;
             margin: 20px auto;
         }
-
         #qr-reader-results {
             margin-top: 20px;
             color: #007b00;
         }
     </style>
 </head>
-
 <body>
     <h2>Scan a QR Code</h2>
     <div id="qr-reader"></div>
@@ -40,7 +35,7 @@
         function onScanSuccess(decodedText, decodedResult) {
             // Show the result
             document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
-
+            
             // Send the decoded QR code data back to the Telegram bot
             Telegram.WebApp.sendData(decodedText); // Sending QR data back to the Telegram bot
         }
@@ -69,5 +64,4 @@
         Telegram.WebApp.ready();
     </script>
 </body>
-
 </html>
