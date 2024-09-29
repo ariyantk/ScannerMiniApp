@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #qr-reader {
+            width: 300px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>Scan a QR Code</h2>
+    <div id="qr-reader"></div>
+    <div id="qr-reader-results"></div>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Display the scanned QR code content
+            document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
+
+            // Send the decoded data back to the Telegram bot using WebApp.sendData()
+            Telegram.WebApp.sendData(decodedText); // Sending QR data back to the Telegram bot
+        }
+
+        function onScanError(errorMessage) {
+            // Handle scan errors or failures
+            console.error(`QR scan error: ${errorMessage}`);
+        }
+
+        // Start the QR code scanner
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start({ facingMode: "environment" }, {
+            fps: 10,    // Scanning frame per second
+            qrbox: 250  // QR code scanning box size
+        }, onScanSuccess, onScanError);
+
+        // Initialize the Telegram Web App
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
