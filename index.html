@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        #qr-reader-results {
+            margin-top: 20px;
+            color: #007b00;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Scan a QR Code</h2>
+    <div id="qr-reader"></div>
+    <div id="qr-reader-results"></div>
+
+    <script>
+        // Success callback when a QR code is successfully scanned
+        function onScanSuccess(decodedText, decodedResult) {
+            // Show the result
+            document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
+
+            // Send the decoded QR code data back to the Telegram bot
+            Telegram.WebApp.sendData(decodedText); // Sending QR data back to the Telegram bot
+        }
+
+        // Error callback in case scanning fails
+        function onScanError(errorMessage) {
+            console.warn(`QR scan error: ${errorMessage}`);
+        }
+
+        // Start scanning with the camera
+        const html5QrCode = new Html5Qrcode("qr-reader");
+
+        html5QrCode.start(
+            { facingMode: "environment" }, // Use the back camera on smartphones
+            {
+                fps: 10,   // Frames per second for scanning
+                qrbox: 250 // Scanning box (can be adjusted)
+            },
+            onScanSuccess,
+            onScanError
+        ).catch(err => {
+            console.error("Failed to start QR scanner", err);
+        });
+
+        // Signal that the web app is ready to Telegram
+        Telegram.WebApp.ready();
+    </script>
+</body>
+
+</html>
