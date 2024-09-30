@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <!-- Corrected link for html5-qrcode -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         body {
@@ -37,30 +36,31 @@
     <div id="qr-reader-results"></div>
 
     <script>
-        // Ensure the html5-qrcode library is loaded before using it
         document.addEventListener("DOMContentLoaded", function () {
-            // Success callback when a QR code is successfully scanned
             function onScanSuccess(decodedText, decodedResult) {
-                // Show the result
+                // نمایش نتیجه‌ی بارکد
                 document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                // Send the decoded QR code data back to the Telegram bot
-                Telegram.WebApp.sendData(decodedText); // Sending QR data back to the Telegram bot
+                // ارسال داده به ربات تلگرام
+                Telegram.WebApp.sendData(decodedText);
+
+                // بستن وب‌اپ و بازگشت به چت
+                setTimeout(function() {
+                    Telegram.WebApp.close(); // بسته شدن وب‌اپ
+                }, 1000); // تاخیر یک ثانیه‌ای برای نمایش نتیجه قبل از بسته شدن
             }
 
-            // Error callback in case scanning fails
             function onScanError(errorMessage) {
                 console.warn(`QR scan error: ${errorMessage}`);
             }
 
-            // Start scanning with the camera
             const html5QrCode = new Html5Qrcode("qr-reader");
 
             html5QrCode.start(
-                { facingMode: "environment" }, // Use the back camera on smartphones
+                { facingMode: "environment" },
                 {
-                    fps: 10,   // Frames per second for scanning
-                    qrbox: 250 // Scanning box (can be adjusted)
+                    fps: 10,
+                    qrbox: 250
                 },
                 onScanSuccess,
                 onScanError
@@ -68,7 +68,6 @@
                 console.error("Failed to start QR scanner", err);
             });
 
-            // Signal that the web app is ready to Telegram
             Telegram.WebApp.ready();
         });
     </script>
