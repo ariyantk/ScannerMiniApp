@@ -41,7 +41,7 @@
                 document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
                 // ارسال داده به n8n از طریق POST
-                fetch("https://n8n.inbeet.tech/webhook/71ffe19f-1a0f-412e-a7d0-beca282ef151", {
+                fetch("https://n8n.inbeet.tech/webhook-test/71ffe19f-1a0f-412e-a7d0-beca282ef151", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
