@@ -37,23 +37,42 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // تابعی برای خواندن پارامترهای URL (مثلاً user_id)
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            // دریافت user_id از URL
+            const userId = getQueryParam("user_id");
+
+            // تعیین آدرس Webhook بر اساس user_id
+            let webhookUrl;
+            if (userId === '12345') {
+                webhookUrl = "https://YOUR_N8N_WEBHOOK_URL_FOR_USER_12345";
+            } else if (userId === '67890') {
+                webhookUrl = "https://YOUR_N8N_WEBHOOK_URL_FOR_USER_67890";
+            } else {
+                webhookUrl = "https://YOUR_DEFAULT_N8N_WEBHOOK_URL";
+            }
+
             function onScanSuccess(decodedText, decodedResult) {
                 document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                // ارسال داده به n8n از طریق POST
-                fetch("https://n8n.inbeet.tech/webhook-test/71ffe19f-1a0f-412e-a7d0-beca282ef151", {
+                // ارسال داده به Webhook بر اساس user_id
+                fetch(webhookUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        qrCodeData: decodedText
+                        qrCodeData: decodedText,
+                        userId: userId  // ارسال user_id به همراه داده‌ها
                     })
                 })
                     .then(response => response.json())
                     .then(data => {
                         console.log('Data sent to n8n:', data);
-                        Telegram.WebApp.close()
                     })
                     .catch((error) => {
                         console.error('Error sending data to n8n:', error);
