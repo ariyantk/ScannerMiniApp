@@ -53,6 +53,7 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Data sent to n8n:', data);
+                        Telegram.WebApp.close()
                     })
                     .catch((error) => {
                         console.error('Error sending data to n8n:', error);
