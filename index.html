@@ -70,13 +70,12 @@
                     })
                     .then(data => {
                         console.log('Data received from n8n:', data);
-                        // ریدایرکت به چت بات تلگرام پس از موفقیت
-                        window.location.href = "https://t.me/AmiriranAssistantbot"; // لینک بات تلگرام
-                        //window.open("https://t.me/AmiriranAssistantbot", "_blank");
-                        //window.location.assign("https://t.me/AmiriranAssistantbot");
-                        Telegram.WebApp.close();
-                        window.Telegram.WebApp.close();
-
+                        setTimeout(function () {
+                            // ریدایرکت به چت بات تلگرام پس از موفقیت
+                            window.location.href = "https://t.me/AmiriranAssistantbot"; // لینک بات تلگرام
+                            Telegram.WebApp.close();
+                            window.Telegram.WebApp.close();
+                        }, 500); // تأخیر 0.5 ثانیه
                     })
 
                     .catch((error) => {
