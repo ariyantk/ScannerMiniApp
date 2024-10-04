@@ -49,6 +49,9 @@
             // Webhook URL based on user_id
             let webhookUrl = "https://n8n.inbeet.tech/webhook/telegramScanBarcode";
 
+            //set situation
+            let scan = false;
+
             // Function to add delay
             function delay(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
@@ -56,32 +59,40 @@
 
             // Scan success function
             async function onScanSuccess(decodedText, decodedResult) {
-                document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
+                if (!scan) {
 
-                // Sending data to the webhook with delay between requests
-                try {
-                    const response = await fetch(webhookUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            qrCodeData: decodedText,
-                            userId: userId  // Send user_id along with data
-                        })
-                    });
+                    document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                    // Log the response status
-                    console.log('Response status:', response.status);
-                    const data = await response.json();
-                    console.log('Data received from n8n:', data);
+                    // Sending data to the webhook with delay between requests
+                    try {
+                        const response = await fetch(webhookUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                qrCodeData: decodedText,
+                                userId: userId  // Send user_id along with data
+                            })
+                        });
+                        scan = true
 
-                    // Wait for 2.5 seconds before redirecting to the Telegram bot
-                    await delay(500);
+                        // Log the response status
+                        console.log('Response status:', response.status);
+                        const data = await response.json();
+                        console.log('Data received from n8n:', data);
+
+                        // Wait for 2.5 seconds before redirecting to the Telegram bot
+                        await delay(500);
+                        window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
+                        Telegram.WebApp.close();
+                    } catch (error) {
+                        console.error('Error sending data to n8n:', error);
+                    }
+                }
+                else {
                     window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
                     Telegram.WebApp.close();
-                } catch (error) {
-                    console.error('Error sending data to n8n:', error);
                 }
 
                 // Close the web app after sending data
