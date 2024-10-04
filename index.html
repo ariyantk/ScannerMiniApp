@@ -36,6 +36,8 @@
     <div id="qr-reader-results"></div>
 
     <script>
+        //set situation
+        let scan = false;
         document.addEventListener("DOMContentLoaded", function () {
             // Function to read URL parameters (e.g., user_id)
             function getQueryParam(param) {
@@ -49,8 +51,7 @@
             // Webhook URL based on user_id
             let webhookUrl = "https://n8n.inbeet.tech/webhook/telegramScanBarcode";
 
-            //set situation
-            let scan = false;
+
 
             // Function to add delay
             function delay(ms) {
@@ -81,9 +82,6 @@
                         console.log('Response status:', response.status);
                         const data = await response.json();
                         console.log('Data received from n8n:', data);
-
-                        // Wait for 2.5 seconds before redirecting to the Telegram bot
-                        await delay(500);
                         window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
                         Telegram.WebApp.close();
                     } catch (error) {
