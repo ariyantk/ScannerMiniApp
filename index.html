@@ -60,64 +60,61 @@
 
             // Scan success function
             async function onScanSuccess(decodedText, decodedResult) {
-                if (!scan) {
+                document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                    document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
+                // Sending data to the webhook with delay between requests
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            qrCodeData: decodedText,
+                            userId: userId  // Send user_id along with data
+                        })
+                    });
 
-                    // Sending data to the webhook with delay between requests
-                    try {
-                        const response = await fetch(webhookUrl, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                qrCodeData: decodedText,
-                                userId: userId  // Send user_id along with data
-                            })
-                        });
-                        scan = true
-
-                        // Log the response status
-                        console.log('Response status:', response.status);
-                        const data = await response.json();
-                        console.log('Data received from n8n:', data);
-                        window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
-                        Telegram.WebApp.close();
-                    } catch (error) {
-                        console.error('Error sending data to n8n:', error);
-                    }
-                }
-                else {
+                    // Log the response status
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Data received from n8n:', data);
                     window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
                     Telegram.WebApp.close();
+                } catch (error) {
+                    console.error('Error sending data to n8n:', error);
                 }
-
-                // Close the web app after sending data
-                setTimeout(function () {
-                    Telegram.WebApp.close();
-                }, 500);
             }
+
+
+            // Close the web app after sending data
+            setTimeout(function () {
+                Telegram.WebApp.close();
+            }, 0);
 
             function onScanError(errorMessage) {
                 console.warn(`QR scan error: ${errorMessage}`);
             }
 
             const html5QrCode = new Html5Qrcode("qr-reader");
+            if (!scan) {
 
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                onScanSuccess,
-                onScanError
-            ).catch(err => {
-                console.error("Failed to start QR scanner", err);
-            });
-
-            Telegram.WebApp.ready();
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: 250
+                    },
+                    onScanSuccess,
+                    onScanError
+                ).catch(err => {
+                    console.error("Failed to start QR scanner", err);
+                });
+                scan = true
+                Telegram.WebApp.ready();
+            } else {
+                window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
+            }
         });
     </script>
 </body>
