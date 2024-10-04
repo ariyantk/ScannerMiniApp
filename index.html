@@ -37,52 +37,54 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // تابعی برای خواندن پارامترهای URL (مثلاً user_id)
+            // Function to read URL parameters (e.g., user_id)
             function getQueryParam(param) {
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get(param);
             }
 
-            // دریافت user_id از URL
+            // Retrieve user_id from URL
             const userId = getQueryParam("user_id");
 
-            // تعیین آدرس Webhook بر اساس user_id
+            // Webhook URL based on user_id
             let webhookUrl = "https://n8n.inbeet.tech/webhook/telegramScanBarcode";
 
-            function onScanSuccess(decodedText, decodedResult) {
+            // Function to add delay
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            // Scan success function
+            async function onScanSuccess(decodedText, decodedResult) {
                 document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                // ارسال داده به Webhook بر اساس user_id
-                fetch(webhookUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        qrCodeData: decodedText,
-                        userId: userId  // ارسال user_id به همراه داده‌ها
-                    })
-                })
-                    .then(response => {
-                        // وضعیت پاسخ را چاپ کنید
-                        console.log('Response status:', response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Data received from n8n:', data);
-                        setTimeout(function () {
-                            // ریدایرکت به چت بات تلگرام پس از موفقیت
-                            window.location.href = "https://t.me/AmiriranAssistantbot"; // لینک بات تلگرام
-                            Telegram.WebApp.close();
-                            window.Telegram.WebApp.close();
-                        }, 2500); // تأخیر 2.5 ثانیه
-                    })
-
-                    .catch((error) => {
-                        console.error('Error sending data to n8n:', error);
+                // Sending data to the webhook with delay between requests
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            qrCodeData: decodedText,
+                            userId: userId  // Send user_id along with data
+                        })
                     });
 
-                // بستن وب‌اپ بعد از ارسال داده‌ها
+                    // Log the response status
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Data received from n8n:', data);
+
+                    // Wait for 2.5 seconds before redirecting to the Telegram bot
+                    await delay(2500);
+                    window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
+                    Telegram.WebApp.close();
+                } catch (error) {
+                    console.error('Error sending data to n8n:', error);
+                }
+
+                // Close the web app after sending data
                 setTimeout(function () {
                     Telegram.WebApp.close();
                 }, 1000);
