@@ -36,8 +36,9 @@
     <div id="qr-reader-results"></div>
 
     <script>
-        //set situation
-        let scan = false;
+        // Set scan flag to allow only one scan
+        let scanComplete = false;
+
         document.addEventListener("DOMContentLoaded", function () {
             // Function to read URL parameters (e.g., user_id)
             function getQueryParam(param) {
@@ -51,8 +52,6 @@
             // Webhook URL based on user_id
             let webhookUrl = "https://n8n.inbeet.tech/webhook/telegramScanBarcode";
 
-
-
             // Function to add delay
             function delay(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
@@ -60,9 +59,15 @@
 
             // Scan success function
             async function onScanSuccess(decodedText, decodedResult) {
+                // Check if a scan has already been completed
+                if (scanComplete) return;
+
+                // Mark scan as complete
+                scanComplete = true;
+
                 document.getElementById("qr-reader-results").innerHTML = `QR Code Data: ${decodedText}`;
 
-                // Sending data to the webhook with delay between requests
+                // Sending data to the webhook
                 try {
                     const response = await fetch(webhookUrl, {
                         method: "POST",
@@ -74,49 +79,38 @@
                             userId: userId  // Send user_id along with data
                         })
                     });
-                    await delay(5000)
 
-                    // Log the response status
-                    console.log('Response status:', response.status);
-                    const data = await response.json();
-                    console.log('Data received from n8n:', data);
-                    window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
+                    // Wait for the response and then redirect
+                    await delay(1000);
+                    window.location.href = "https://t.me/AmiriranAssistantbot"; // Redirect to Telegram bot link
                     Telegram.WebApp.close();
                 } catch (error) {
                     console.error('Error sending data to n8n:', error);
                 }
             }
 
-
-            // Close the web app after sending data
-            setTimeout(function () {
-                Telegram.WebApp.close();
-            }, 0);
-
+            // Scan error function
             function onScanError(errorMessage) {
                 console.warn(`QR scan error: ${errorMessage}`);
             }
-            console.log(scan)
-            const html5QrCode = new Html5Qrcode("qr-reader");
-            if (!scan) {
 
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    {
-                        fps: 10,
-                        qrbox: 250
-                    },
-                    onScanSuccess,
-                    onScanError
-                ).catch(err => {
-                    console.error("Failed to start QR scanner", err);
-                });
-                scan = true
-                console.log(scan)
-                Telegram.WebApp.ready();
-            } else {
-                window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
-            }
+            const html5QrCode = new Html5Qrcode("qr-reader");
+
+            // Start QR code scanning
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                console.error("Failed to start QR scanner", err);
+            });
+
+            // Ready the Telegram Web App
+            Telegram.WebApp.ready();
         });
     </script>
 </body>
