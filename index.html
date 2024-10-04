@@ -95,7 +95,7 @@
             function onScanError(errorMessage) {
                 console.warn(`QR scan error: ${errorMessage}`);
             }
-
+            console.log(scan)
             const html5QrCode = new Html5Qrcode("qr-reader");
             if (!scan) {
 
@@ -111,6 +111,7 @@
                     console.error("Failed to start QR scanner", err);
                 });
                 scan = true
+                console.log(scan)
                 Telegram.WebApp.ready();
             } else {
                 window.location.href = "https://t.me/AmiriranAssistantbot"; // Telegram bot link
